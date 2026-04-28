@@ -16,8 +16,8 @@ USER=$(whoami)
 
 # 2. Install Node.js & Codex CLI
 echo "Dang kiem tra Node.js..."
-if ! command -v node &> /dev/null; then
-    echo "Chua tim thay Node.js. Dang cai dat Node.js v20..."
+if ! command -v node &> /dev/null || ! command -v npm &> /dev/null; then
+    echo "Chua tim thay Node.js hoac NPM. Dang cai dat Node.js v20..."
     curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
     sudo apt-get install -y nodejs
 fi
