@@ -18,6 +18,10 @@ USER=$(whoami)
 echo "Dang kiem tra Node.js..."
 if ! command -v node &> /dev/null || ! command -v npm &> /dev/null; then
     echo "Chua tim thay Node.js hoac NPM. Dang cai dat Node.js v20..."
+    if ! command -v curl &> /dev/null; then
+        sudo apt-get update
+        sudo apt-get install -y curl
+    fi
     curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
     sudo apt-get install -y nodejs
 fi
