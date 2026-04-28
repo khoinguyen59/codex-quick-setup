@@ -12,17 +12,23 @@ Trước khi cài đặt, bạn **phải có sẵn `API_KEY`** do hệ thống c
 
 ## 🪟 Hướng Dẫn Cài Đặt Trên Windows
 
-Hệ điều hành Windows hỗ trợ cài đặt vô cùng trực quan, không cần gõ lệnh phức tạp.
+Hệ điều hành Windows hỗ trợ cài đặt cực kỳ nhanh chóng. Bạn có thể chọn tải mã nguồn theo 1 trong 2 cách sau:
 
 **Bước 1: Tải mã nguồn về máy**
-1. Trên trang GitHub này, bấm vào nút xanh lá cây **"<> Code"** ở góc trên cùng bên phải.
-2. Chọn **"Download ZIP"**.
-3. Giải nén file ZIP vừa tải về ra một thư mục bất kỳ trên máy tính của bạn (ví dụ: Desktop hoặc Downloads).
+* **Cách 1 (Khuyên dùng cho Coder): Dùng lệnh Git**
+  Mở Terminal (PowerShell hoặc CMD) và gõ lệnh:
+  ```bash
+  git clone https://github.com/khoinguyen59/codex-quick-setup.git
+  cd codex-quick-setup
+  ```
+* **Cách 2 (Dành cho người dùng phổ thông): Tải file ZIP**
+  1. Trên trang GitHub này, bấm vào nút xanh lá cây **"<> Code"** ở góc trên cùng bên phải.
+  2. Chọn **"Download ZIP"** và giải nén ra một thư mục bất kỳ.
+  3. Mở thư mục vừa giải nén.
 
 **Bước 2: Chạy bộ cài đặt**
-1. Mở thư mục vừa giải nén.
-2. **Click đúp chuột** vào file `install-windows.bat`.
-3. Một cửa sổ đen (Terminal) sẽ hiện ra (có thể Windows sẽ hỏi quyền Administrator, hãy chọn `Yes`).
+1. Tìm và **Click đúp chuột** vào file `install-windows.bat` (hoặc gõ `.\install-windows.bat` nếu bạn đang dùng Terminal).
+2. Một cửa sổ màu đen sẽ hiện ra (nếu Windows hỏi quyền Administrator, hãy chọn `Yes`).
 
 **Bước 3: Nhập API Key**
 1. Tại cửa sổ màu đen, hệ thống sẽ yêu cầu: `Nhap API_KEY cua ban:`
