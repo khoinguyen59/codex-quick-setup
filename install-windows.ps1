@@ -84,14 +84,15 @@ trust_level = "trusted"
 [windows]
 sandbox = "unelevated"
 "@
-Set-Content -Path "$codexDir\config.toml" -Value $configContent -Encoding UTF8
+$utf8NoBom = New-Object System.Text.UTF8Encoding($False)
+[System.IO.File]::WriteAllText("$codexDir\config.toml", $configContent, $utf8NoBom)
 
 $authContent = @"
 {
   "OPENAI_API_KEY": "$API_KEY"
 }
 "@
-Set-Content -Path "$codexDir\auth.json" -Value $authContent -Encoding UTF8
+[System.IO.File]::WriteAllText("$codexDir\auth.json", $authContent, $utf8NoBom)
 Write-Host "Da ghi cau hinh Codex CLI thanh cong." -ForegroundColor Green
 
 # 6. Setup Auto-start (VBS Script in Startup folder)
