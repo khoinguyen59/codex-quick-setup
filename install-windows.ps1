@@ -5,17 +5,17 @@
 # Check Admin Privileges
 $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-Not $isAdmin) {
-    Write-Host "Vui lòng chạy file install-windows.bat thay vì chạy trực tiếp file ps1 này (để được cấp quyền Admin)." -ForegroundColor Red
+    Write-Host "Vui long chay file install-windows.bat de duoc cap quyen Admin." -ForegroundColor Red
     Pause
     exit
 }
 
-Write-Host "Đang bắt đầu cài đặt Codex Proxy..." -ForegroundColor Cyan
+Write-Host "Dang bat dau cai dat Codex Proxy..." -ForegroundColor Cyan
 
 # 1. Prompt for API Key
-$API_KEY = Read-Host "Nhập API_KEY của bạn (Định dạng sk-xxxx...)"
+$API_KEY = Read-Host "Nhap API_KEY cua ban (Dinh dang sk-xxxx...)"
 if ([string]::IsNullOrWhiteSpace($API_KEY)) {
-    Write-Host "API_KEY không được để trống!" -ForegroundColor Red
+    Write-Host "API_KEY khong duoc de trong!" -ForegroundColor Red
     Pause
     exit
 }
@@ -23,21 +23,21 @@ if ([string]::IsNullOrWhiteSpace($API_KEY)) {
 # 2. Check and Install Node.js
 try {
     $nodeVersion = node -v
-    Write-Host "Node.js đã được cài đặt: $nodeVersion" -ForegroundColor Green
+    Write-Host "Node.js da duoc cai dat: $nodeVersion" -ForegroundColor Green
 } catch {
-    Write-Host "Chưa tìm thấy Node.js! Đang tải và cài đặt Node.js..." -ForegroundColor Yellow
+    Write-Host "Chua tim thay Node.js! Dang tai va cai dat Node.js..." -ForegroundColor Yellow
     # Download and install Node.js via winget if available
     winget install OpenJS.NodeJS -e --silent
     $env:Path = [System.Environment]::GetEnvironmentVariable("Path","Machine") + ";" + [System.Environment]::GetEnvironmentVariable("Path","User")
 }
 
 # 3. Install Codex CLI
-Write-Host "Đang xóa cấu hình Codex cũ (nếu có)..." -ForegroundColor Yellow
+Write-Host "Dang xoa cau hinh Codex cu (neu co)..." -ForegroundColor Yellow
 if (Test-Path -Path "$env:USERPROFILE\.codex") {
     Remove-Item -Recurse -Force "$env:USERPROFILE\.codex" -ErrorAction SilentlyContinue
 }
 
-Write-Host "Đang cài đặt Codex CLI..." -ForegroundColor Yellow
+Write-Host "Dang cai dat Codex CLI..." -ForegroundColor Yellow
 npm install -g @openai/codex
 
 # 4. Setup Proxy Script
@@ -52,14 +52,14 @@ $destProxy = "$proxyDir\codex_proxy.js"
 if (Test-Path -Path $sourceProxy) {
     Copy-Item -Path $sourceProxy -Destination $destProxy -Force
 } else {
-    Write-Host "KHÔNG TÌM THẤY file proxy\codex_proxy.js trong bộ cài!" -ForegroundColor Red
+    Write-Host "KHONG TIM THAY file proxy\codex_proxy.js trong bo cai!" -ForegroundColor Red
     Pause
     exit
 }
 
 # Replace API KEY in proxy script
-(Get-Content $destProxy) -replace '<API_KEY_CỦA_BẠN>', $API_KEY | Set-Content $destProxy
-Write-Host "Đã cài đặt mã nguồn Proxy vào $proxyDir" -ForegroundColor Green
+(Get-Content -Path $destProxy -Encoding UTF8) -replace '<API_KEY_CỦA_BẠN>', $API_KEY | Set-Content -Path $destProxy -Encoding UTF8
+Write-Host "Da copy source code Proxy vao $proxyDir" -ForegroundColor Green
 
 # 5. Setup Codex Configs
 $codexDir = "$env:USERPROFILE\.codex"
@@ -92,7 +92,7 @@ $authContent = @"
 }
 "@
 Set-Content -Path "$codexDir\auth.json" -Value $authContent -Encoding UTF8
-Write-Host "Đã ghi cấu hình Codex CLI thành công." -ForegroundColor Green
+Write-Host "Da ghi cau hinh Codex CLI thanh cong." -ForegroundColor Green
 
 # 6. Setup Auto-start (VBS Script in Startup folder)
 $startupFolder = "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup"
@@ -103,10 +103,10 @@ Set WshShell = CreateObject("WScript.Shell")
 WshShell.Run """node"" ""$destProxy""", 0, False
 "@
 Set-Content -Path $vbsPath -Value $vbsContent -Encoding UTF8
-Write-Host "Đã thiết lập tự động khởi động Proxy ngầm vào thư mục Startup." -ForegroundColor Green
+Write-Host "Da thiet lap tu dong khoi dong Proxy ngam vao thu muc Startup." -ForegroundColor Green
 
 # 7. Start Proxy now
-Write-Host "Đang khởi động Proxy lần đầu..." -ForegroundColor Yellow
+Write-Host "Dang khoi dong Proxy lan dau..." -ForegroundColor Yellow
 Start-Process -FilePath "wscript.exe" -ArgumentList "`"$vbsPath`"" -WindowStyle Hidden
 
 Start-Sleep -Seconds 3
@@ -115,12 +115,12 @@ Start-Sleep -Seconds 3
 try {
     $response = Invoke-WebRequest -Uri "http://127.0.0.1:20129/v1/models" -UseBasicParsing -ErrorAction Stop
     if ($response.StatusCode -eq 200) {
-        Write-Host "CÀI ĐẶT THÀNH CÔNG! Proxy đang hoạt động." -ForegroundColor Green
-        Write-Host "Mở terminal mới và gõ 'codex' để bắt đầu sử dụng." -ForegroundColor Cyan
+        Write-Host "CAI DAT THANH CONG! Proxy dang hoat dong." -ForegroundColor Green
+        Write-Host "Mo terminal moi va go 'codex' de bat dau su dung." -ForegroundColor Cyan
     }
 } catch {
-    Write-Host "Cài đặt có vẻ thành công nhưng không thể test được Proxy. Vui lòng khởi động lại máy tính và thử gõ 'codex'." -ForegroundColor Yellow
+    Write-Host "Cai dat co ve thanh cong nhung khong the test duoc Proxy. Vui long khoi dong lai may tinh va thu go 'codex'." -ForegroundColor Yellow
 }
 
-Write-Host "Nhấn phím bất kỳ để thoát..."
+Write-Host "Nhan phim bat ky de thoat..."
 $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
