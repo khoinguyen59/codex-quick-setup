@@ -32,6 +32,11 @@ try {
 }
 
 # 3. Install Codex CLI
+Write-Host "Đang xóa cấu hình Codex cũ (nếu có)..." -ForegroundColor Yellow
+if (Test-Path -Path "$env:USERPROFILE\.codex") {
+    Remove-Item -Recurse -Force "$env:USERPROFILE\.codex" -ErrorAction SilentlyContinue
+}
+
 Write-Host "Đang cài đặt Codex CLI..." -ForegroundColor Yellow
 npm install -g @openai/codex
 

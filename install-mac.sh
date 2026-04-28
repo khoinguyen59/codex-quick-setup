@@ -22,6 +22,9 @@ if ! command -v node &> /dev/null; then
 fi
 NODE_PATH=$(which node)
 
+echo "Đang xóa cấu hình Codex cũ (nếu có)..."
+rm -rf "$HOME/.codex"
+
 echo "Đang cài đặt Codex CLI..."
 sudo npm install -g @openai/codex || npm install -g @openai/codex
 

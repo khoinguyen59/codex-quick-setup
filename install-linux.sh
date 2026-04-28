@@ -26,6 +26,9 @@ NODE_PATH=$(which node)
 echo "Cài đặt bubblewrap (cần cho sandbox)..."
 sudo apt-get install -y bubblewrap || echo "Không cài được bubblewrap, tiếp tục..."
 
+echo "Đang xóa cấu hình Codex cũ (nếu có)..."
+rm -rf "$HOME/.codex"
+
 echo "Đang cài đặt Codex CLI..."
 sudo npm install -g @openai/codex
 
