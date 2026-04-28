@@ -6,30 +6,30 @@ echo "CODEX PROXY - AUTOMATED INSTALLER FOR UBUNTU/LINUX"
 echo "========================================================="
 
 # 1. Prompt for API Key
-read -p "Nhập API_KEY của bạn (Định dạng sk-xxxx...): " API_KEY
+read -p "Nhap API_KEY cua ban (Dinh dang sk-xxxx...): " API_KEY
 if [ -z "$API_KEY" ]; then
-    echo "API_KEY không được để trống!"
+    echo "API_KEY khong duoc de trong!"
     exit 1
 fi
 
 USER=$(whoami)
 
 # 2. Install Node.js & Codex CLI
-echo "Đang kiểm tra Node.js..."
+echo "Dang kiem tra Node.js..."
 if ! command -v node &> /dev/null; then
-    echo "Chưa tìm thấy Node.js. Đang cài đặt Node.js v20..."
+    echo "Chua tim thay Node.js. Dang cai dat Node.js v20..."
     curl -fsSL https://deb.nodesource.com/setup_20.x | sudo -E bash -
     sudo apt-get install -y nodejs
 fi
 NODE_PATH=$(which node)
 
-echo "Cài đặt bubblewrap (cần cho sandbox)..."
-sudo apt-get install -y bubblewrap || echo "Không cài được bubblewrap, tiếp tục..."
+echo "Cai dat bubblewrap (can cho sandbox)..."
+sudo apt-get install -y bubblewrap || echo "Khong cai duoc bubblewrap, tiep tuc..."
 
-echo "Đang xóa cấu hình Codex cũ (nếu có)..."
+echo "Dang xoa cau hinh Codex cu (neu co)..."
 rm -rf "$HOME/.codex"
 
-echo "Đang cài đặt Codex CLI..."
+echo "Dang cai dat Codex CLI..."
 sudo npm install -g @openai/codex
 
 # 3. Setup Proxy Script
@@ -37,13 +37,13 @@ PROXY_DIR="/home/$USER/codex-proxy"
 mkdir -p "$PROXY_DIR"
 
 if [ ! -f "./proxy/codex_proxy.js" ]; then
-    echo "LỖI: Không tìm thấy file proxy/codex_proxy.js trong bộ cài!"
+    echo "LOI: Khong tim thay file proxy/codex_proxy.js trong bo cai!"
     exit 1
 fi
 
 cp "./proxy/codex_proxy.js" "$PROXY_DIR/codex_proxy.js"
 sed -i "s/<API_KEY_CỦA_BẠN>/$API_KEY/g" "$PROXY_DIR/codex_proxy.js"
-echo "Đã cài đặt mã nguồn Proxy vào $PROXY_DIR"
+echo "Da cai dat ma nguon Proxy vao $PROXY_DIR"
 
 # 4. Setup Codex Configs
 CODEX_DIR="/home/$USER/.codex"
@@ -72,10 +72,10 @@ cat > "$CODEX_DIR/auth.json" << EOF
   "OPENAI_API_KEY": "$API_KEY"
 }
 EOF
-echo "Đã cấu hình config Codex CLI."
+echo "Da cau hinh config Codex CLI."
 
 # 5. Setup Systemd Auto-start
-echo "Thiết lập chạy ngầm với systemd..."
+echo "Thiet lap chay ngam voi systemd..."
 sudo tee /etc/systemd/system/codex-proxy.service > /dev/null << EOF
 [Unit]
 Description=Codex Proxy API v3
@@ -99,13 +99,13 @@ sudo systemctl daemon-reload
 sudo systemctl enable codex-proxy
 sudo systemctl start codex-proxy
 
-echo "Đang khởi động Proxy..."
+echo "Dang khoi dong Proxy..."
 sleep 3
 
 # 6. Test Proxy
 if curl -s http://127.0.0.1:20129/v1/models | grep -q "object"; then
-    echo "✅ CÀI ĐẶT THÀNH CÔNG! Proxy đang hoạt động ngầm (systemd)."
-    echo "Mở Terminal mới và gõ 'codex' để bắt đầu sử dụng."
+    echo "CAI DAT THANH CONG! Proxy dang hoat dong ngam (systemd)."
+    echo "Mo Terminal moi va go 'codex' de bat dau su dung."
 else
-    echo "⚠️ Đã cài đặt nhưng Proxy báo lỗi. Dùng 'sudo journalctl -u codex-proxy -f' để xem lỗi."
+    echo "Da cai dat nhung Proxy bao loi. Dung 'sudo journalctl -u codex-proxy -f' de xem loi."
 fi
