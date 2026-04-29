@@ -2,7 +2,7 @@
 // Translates Codex /responses → 9router /chat/completions (streaming)
 const http = require('http');
 
-const REAL_HOST = '20.41.119.173';
+const REAL_HOST = '20.196.67.130';
 const REAL_PORT = 20128;
 const LOCAL_PORT = 20129;
 const API_KEY = 'sk-1a1026f48853b71b-nlke1l-f7ffa657';
