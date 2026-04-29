@@ -10,14 +10,14 @@ const API_KEY = 'YOUR_API_KEY_HERE';
 const VALID_MODELS = [
   { id: 'gpt-5.5',           full: 'cx/gpt-5.5' },
   { id: 'gpt-5.4',           full: 'cx/gpt-5.4' },
-  { id: 'gpt-5.3-codex',     full: 'cx/gpt-5.3-codex' },
-  { id: 'gpt-5.3-codex-high',full: 'cx/gpt-5.3-codex-high' },
+  { id: 'gpt-5.3-codex',     full: 'cx/gpt-5.5' }, // Map to 5.5 for image support
+  { id: 'gpt-5.3-codex-high',full: 'cx/gpt-5.5' },
   { id: 'gpt-5.2',           full: 'cx/gpt-5.2' },
   { id: 'gpt-5.1',           full: 'cx/gpt-5.1-codex-mini' },
   { id: 'gpt-5',             full: 'cx/gpt-5.5' },
-  { id: 'o3',                full: 'cx/gpt-5.3-codex-xhigh' },
-  { id: 'o3-mini',           full: 'cx/gpt-5.3-codex-high' },
-  { id: 'o4-mini',           full: 'cx/gpt-5.3-codex-high' },
+  { id: 'o3',                full: 'cx/gpt-5.5' },
+  { id: 'o3-mini',           full: 'cx/gpt-5.5' },
+  { id: 'o4-mini',           full: 'cx/gpt-5.5' },
   { id: 'grok-4',            full: 'xai/grok-4' },
   { id: 'grok-3',            full: 'xai/grok-3' },
   { id: 'gemini-2.5-pro',    full: 'gemini/gemini-2.5-pro' },
@@ -32,6 +32,52 @@ function mapModel(model) {
 // ═══════════════════════════════════════════
 // INPUT CONVERSION
 // ═══════════════════════════════════════════
+
+function convertContentParts(content) {
+  // content can be a string, an array of parts, or undefined
+  if (!content) return '';
+  if (typeof content === 'string') return content;
+  if (!Array.isArray(content)) return String(content);
+
+  // Convert Responses API content parts → Chat Completions API content parts
+  const parts = [];
+  for (const part of content) {
+    if (typeof part === 'string') {
+      parts.push({ type: 'text', text: part });
+    } else if (part.type === 'input_text') {
+      // Responses API text → Chat Completions text
+      parts.push({ type: 'text', text: part.text || '' });
+    } else if (part.type === 'input_image') {
+      // Responses API image → Chat Completions image_url
+      // Responses API: { type: "input_image", image_url: "data:image/..." }
+      // Chat Completions: { type: "image_url", image_url: { url: "data:image/..." } }
+      const url = typeof part.image_url === 'string' ? part.image_url
+                : (part.image_url?.url || part.url || '');
+      parts.push({
+        type: 'image_url',
+        image_url: { url, detail: part.detail || 'auto' }
+      });
+    } else if (part.type === 'image_url') {
+      // Already in Chat Completions format, pass through
+      if (typeof part.image_url === 'string') {
+        parts.push({ type: 'image_url', image_url: { url: part.image_url, detail: 'auto' } });
+      } else {
+        parts.push(part);
+      }
+    } else if (part.type === 'text') {
+      parts.push({ type: 'text', text: part.text || '' });
+    } else {
+      // Unknown part type — try to extract text
+      parts.push({ type: 'text', text: part.text || JSON.stringify(part) });
+    }
+  }
+
+  // If all parts are text-only, flatten to a single string for efficiency
+  if (parts.every(p => p.type === 'text')) {
+    return parts.map(p => p.text).join('');
+  }
+  return parts;
+}
 
 function convertInputToMessages(input) {
   if (!Array.isArray(input)) return [{ role: 'user', content: String(input) }];
@@ -57,13 +103,7 @@ function convertInputToMessages(input) {
       }
     } else {
       const role = item.role || 'user';
-      let content = '';
-      if (Array.isArray(item.content)) {
-        content = item.content.map(c => typeof c === 'string' ? c : (c.text || JSON.stringify(c))).join('');
-      } else {
-        content = item.content || '';
-      }
-      messages.push({ role, content });
+      messages.push({ role, content: convertContentParts(item.content) });
     }
   }
   return messages;
