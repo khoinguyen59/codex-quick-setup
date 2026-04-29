@@ -58,7 +58,10 @@ if (Test-Path -Path $sourceProxy) {
 }
 
 # Replace API KEY in proxy script
-(Get-Content -Path $destProxy -Encoding UTF8) -replace '<API_KEY_CỦA_BẠN>', $API_KEY | Set-Content -Path $destProxy -Encoding UTF8
+$utf8NoBom = New-Object System.Text.UTF8Encoding($False)
+$proxyContent = Get-Content -Path $destProxy -Raw -Encoding UTF8
+$proxyContent = $proxyContent -replace '<API_KEY_CỦA_BẠN>', $API_KEY
+[System.IO.File]::WriteAllText($destProxy, $proxyContent, $utf8NoBom)
 Write-Host "Da copy source code Proxy vao $proxyDir" -ForegroundColor Green
 
 # 5. Setup Codex Configs
@@ -84,7 +87,6 @@ trust_level = "trusted"
 [windows]
 sandbox = "unelevated"
 "@
-$utf8NoBom = New-Object System.Text.UTF8Encoding($False)
 [System.IO.File]::WriteAllText("$codexDir\config.toml", $configContent, $utf8NoBom)
 
 $authContent = @"
@@ -103,7 +105,8 @@ $vbsContent = @"
 Set WshShell = CreateObject("WScript.Shell")
 WshShell.Run """node"" ""$destProxy""", 0, False
 "@
-Set-Content -Path $vbsPath -Value $vbsContent -Encoding UTF8
+$asciiEncoding = New-Object System.Text.ASCIIEncoding
+[System.IO.File]::WriteAllText($vbsPath, $vbsContent, $asciiEncoding)
 Write-Host "Da thiet lap tu dong khoi dong Proxy ngam vao thu muc Startup." -ForegroundColor Green
 
 # 7. Start Proxy now
