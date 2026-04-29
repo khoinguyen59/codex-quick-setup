@@ -46,7 +46,7 @@ if [ ! -f "./proxy/codex_proxy.js" ]; then
 fi
 
 cp "./proxy/codex_proxy.js" "$PROXY_DIR/codex_proxy.js"
-sed -i "s/<API_KEY_CỦA_BẠN>/$API_KEY/g" "$PROXY_DIR/codex_proxy.js"
+sed -i "s/YOUR_API_KEY_HERE/$API_KEY/g" "$PROXY_DIR/codex_proxy.js"
 echo "Da cai dat ma nguon Proxy vao $PROXY_DIR"
 
 # 4. Setup Codex Configs

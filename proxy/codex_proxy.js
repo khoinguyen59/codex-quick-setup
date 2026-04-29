@@ -5,7 +5,7 @@ const http = require('http');
 const REAL_HOST = '20.196.67.130';
 const REAL_PORT = 20128;
 const LOCAL_PORT = 20129;
-const API_KEY = '<API_KEY_CỦA_BẠN>';
+const API_KEY = 'YOUR_API_KEY_HERE';
 
 const VALID_MODELS = [
   { id: 'gpt-5.5',           full: 'cx/gpt-5.5' },

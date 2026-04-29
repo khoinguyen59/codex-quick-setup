@@ -60,7 +60,7 @@ if (Test-Path -Path $sourceProxy) {
 # Replace API KEY in proxy script
 $utf8NoBom = New-Object System.Text.UTF8Encoding($False)
 $proxyContent = Get-Content -Path $destProxy -Raw -Encoding UTF8
-$proxyContent = $proxyContent -replace '<API_KEY_CỦA_BẠN>', $API_KEY
+$proxyContent = $proxyContent -replace 'YOUR_API_KEY_HERE', $API_KEY
 [System.IO.File]::WriteAllText($destProxy, $proxyContent, $utf8NoBom)
 Write-Host "Da copy source code Proxy vao $proxyDir" -ForegroundColor Green
 
