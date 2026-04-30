@@ -109,7 +109,17 @@ $asciiEncoding = New-Object System.Text.ASCIIEncoding
 [System.IO.File]::WriteAllText($vbsPath, $vbsContent, $asciiEncoding)
 Write-Host "Da thiet lap tu dong khoi dong Proxy ngam vao thu muc Startup." -ForegroundColor Green
 
-# 7. Start Proxy now
+# 7. Kill old proxy and start new one
+Write-Host "Dang tat proxy cu (neu co)..." -ForegroundColor Yellow
+$port = 20129
+$conns = Get-NetTCPConnection -LocalPort $port -State Listen -ErrorAction SilentlyContinue
+if ($conns) {
+    foreach ($conn in $conns) {
+        Stop-Process -Id $conn.OwningProcess -Force -ErrorAction SilentlyContinue
+    }
+    Start-Sleep -Seconds 2
+}
+
 Write-Host "Dang khoi dong Proxy lan dau..." -ForegroundColor Yellow
 Start-Process -FilePath "wscript.exe" -ArgumentList "`"$vbsPath`"" -WindowStyle Hidden
 
