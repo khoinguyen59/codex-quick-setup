@@ -101,7 +101,11 @@ EOF
 
 sudo systemctl daemon-reload
 sudo systemctl enable codex-proxy
-sudo systemctl start codex-proxy
+echo "Dang tat proxy cu (neu co)..."
+sudo systemctl stop codex-proxy 2>/dev/null || true
+sudo lsof -ti:20129 | sudo xargs kill -9 2>/dev/null || true
+sleep 1
+sudo systemctl restart codex-proxy
 
 echo "Dang khoi dong Proxy..."
 sleep 3

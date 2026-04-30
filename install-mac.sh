@@ -100,6 +100,9 @@ cat > "$PLIST_PATH" << EOF
 EOF
 
 launchctl unload "$PLIST_PATH" 2>/dev/null || true
+echo "Dang tat proxy cu (neu co)..."
+lsof -ti:20129 | xargs kill -9 2>/dev/null || true
+sleep 1
 launchctl load "$PLIST_PATH"
 
 echo "Dang khoi dong Proxy..."
